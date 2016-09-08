@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <script src="lodash.js"></script>
+    <style>
+        p {
+            display: block;
+            font-size: 16pt;
+        }
+    </style>
+</head>
+<input type="button" value="Friends" id="fr">
+<input type="button" value="Skills" id="sk">
+<input type="button" value="Names" id="nm">
+
+
+<div>
+
+</div>
+
+<body>
+
+    <script>
+        
+        // при кліку на кнопку витягую json файл 
+        
+        $('#fr').click(function () {
+            $('div').empty();                             //очищаю екран
+            $.ajax({
+                dataType: "json",
+                url: "../data.json",
+                success: function (data) {
+                    var s = [];                    
+                    _.forEach(data, function (x) {       // прохожусь по всім об"єктам
+                        s = _.unionWith(s, x.friends);    //добавляю всіх друзів об"єкта в масив
+                    });
+                    s = _.uniqBy(s, 'name');               //видаляю ті в яких співпадають іменна
+                    _.forEach(s, function (x) {
+                        $('div').append("<p>" + x.name + "</p>");   //вивожу масив на екран
+                    })
+                }
+            });
+        })
+
+        $('#sk').click(function () {
+            $('div').empty();                        //аналогічно попередньому
+            $.ajax({
+                dataType: "json",
+                url: "../data.json",
+                success: function (data) {
+                    var s = [];
+                    _.forEach(data, function (x) {        //аналогічно попередньому
+                        s = _.unionWith(s, x.skills);      //аналогічно попередньому тільки скіли
+                    });
+                    s = _.uniq(s);                        //аналогічно попередньому 
+                    s.sort(function (a, b) {              //сортую іменно так забезпечити сортування не дивлячись на регістер (є скіл Lorem)
+                        return a.toLowerCase().localeCompare(b.toLowerCase());
+                    });
+                    _.forEach(s, function (x) {
+                        $('div').append("<p>" + x + "</p>");      //аналогічно попередньому
+                    })
+                }
+            });
+
+        })
+        $('#nm').click(function () {
+            $('div').empty();                             //аналогічно попередньому
+            $.ajax({
+                dataType: "json",
+                url: "../data.json",
+                success: function (data) {
+                    var s = [];         
+                    s = _.sortBy(data, function (o) {   //спочатку об"єкти сортую за кількістю друзів
+                        return o.friends.length;
+                    });
+                    var names = [];  
+                    _.forEach(s, function (x) {         
+                        names.push(x.name);             //роблю масив імен об"єктів
+                    })
+                    _.forEach(names, function (x) {
+                        $('div').append("<p>" + x + "</p>");      //аналогічно попередньому
+                    })
+                }
+            });
+
+        })
+    </script>
+</body>
+
+</html>
